@@ -95,6 +95,21 @@ class Version:
         self.note_id = note_id
 
 
+def add_version(note_id: int, text: str) -> bool:
+    url_ = __compose_post_request_url('add-version')
+    params = {'note_id': note_id, 'text': text}
+    resp_text, ok = __send_post_request(url_, params)
+    if ok:
+        json_loads = json.loads(resp_text)
+
+        if json_loads['status_code'] == 200:
+            return True
+        else:
+            logging.Logger('warning').warning(json_loads['error'])
+
+    return False
+
+
 def get_versions(note_id: int) -> List[Version]:
     versions: List[Version] = []
 
