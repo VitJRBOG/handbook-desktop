@@ -23,9 +23,8 @@ class Note:
 def get_notes() -> List[Note]:
     notes: List[Note] = []
 
-    global HANDBOOK_API_URL
-    url_ = f'{HANDBOOK_API_URL}/api/get-notes'
-    resp_text, ok = __send_request(url_)
+    request = __compose_get_request_url('get-notes')
+    resp_text, ok = __send_get_request(request)
     if ok:
         json_loads = json.loads(resp_text)
 
@@ -86,7 +85,7 @@ def get_versions(note_id: int) -> List[Version]:
 
     params = {'id': note_id}
     request = __compose_get_request_url('get-versions', params)
-    resp_text, ok = __send_request(request)
+    resp_text, ok = __send_get_request(request)
     if ok:
         json_loads = json.loads(resp_text)
 
@@ -151,7 +150,7 @@ def __compose_get_request_url(method_name: str,
     return url_
 
 
-def __send_request(url_: str) -> Tuple[str, bool]:
+def __send_get_request(url_: str) -> Tuple[str, bool]:
     response = requests.get(url_)
     if response.status_code == 200:
         return response.text, True
