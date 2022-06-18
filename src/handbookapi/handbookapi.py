@@ -20,6 +20,21 @@ class Note:
         self.date = date
 
 
+def add_note(text: str) -> bool:
+    url_ = __compose_post_request_url('add-note')
+    params = {'text': text}
+    resp_text, ok = __send_post_request(url_, params)
+    if ok:
+        json_loads = json.loads(resp_text)
+
+        if json_loads['status_code'] == 200:
+            return True
+        else:
+            logging.Logger('warning').warning(json_loads['error'])
+
+    return False
+
+
 def get_notes() -> List[Note]:
     notes: List[Note] = []
 
@@ -132,6 +147,22 @@ def __parse_versions(items: List[dict[str, Any]]) -> List[Version]:
         versions.append(Version(version_id, text, date, checksum, note_id))
 
     return versions
+
+
+def __compose_post_request_url(method_name: str):
+    global HANDBOOK_API_URL
+    url_ = f'{HANDBOOK_API_URL}/api/{method_name}'
+
+    return url_
+
+
+def __send_post_request(url_: str, params: dict[str, Any]) -> Tuple[str, bool]:
+    response = requests.post(url=url_, data=params)
+    if response.status_code == 200:
+        return response.text, True
+    else:
+        logging.Logger('critical').critical(response.text, stack_info=True)
+        return "", False
 
 
 def __compose_get_request_url(method_name: str,
