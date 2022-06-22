@@ -1,6 +1,5 @@
 import tkinter as tk
 import tkinter.scrolledtext as tkst
-from turtle import width
 from typing import List
 
 from handbookapi import handbookapi
