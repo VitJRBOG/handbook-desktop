@@ -1,3 +1,4 @@
+import threading
 import tkinter as tk
 import tkinter.scrolledtext as tkst
 from typing import List
@@ -130,3 +131,46 @@ class NoteTitleLabel(tk.Label):
     def __display_note_text(self, event):
         notes = handbookapi.get_versions(self.note_id)
         self.note_text_area.update_text(notes[0].id, notes[0].text)
+
+
+class ButtonsFrame(tk.Canvas):
+    note_text_area: NoteTextArea
+
+    def __init__(self, master: NotesListFrame,
+                 note_text_area: NoteTextArea, indent: int):
+        self.note_text_area = note_text_area
+
+        super().__init__(master)
+
+        self.place(x=0, y=indent)
+
+    def add_note(self):
+        if self.note_text_area.note_id == 0:
+            text = self.note_text_area.get('1.0', tk.END)
+            handbookapi.add_note(text)
+
+    def delete_note(self):
+        note_id = self.note_text_area.note_id
+        # TODO: API method for deleting of note is missing
+
+
+class AddButton(tk.Button):
+
+    def __init__(self, master: ButtonsFrame):
+        super().__init__(master, text='+',
+                         command=lambda: threading.Thread(
+                             target=master.add_note,
+                             daemon=True).start())
+
+        self.place(x=0, y=0)
+
+
+class DeleteButton(tk.Button):
+
+    def __init__(self, master: ButtonsFrame):
+        super().__init__(master, text='-',
+                         command=lambda: threading.Thread(
+                             target=master.delete_note,
+                             daemon=True).start())
+
+        self.place(x=40, y=0)

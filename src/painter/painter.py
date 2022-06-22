@@ -5,9 +5,16 @@ from handbookapi import handbookapi
 def make_gui():
     main_window = gui.MainWindow()
     main_frame = gui.MainFrame(main_window)
+
     list_frame = gui.NotesListFrame(main_frame)
+
     note_text_frame = gui.NoteTextFrame(main_frame, list_frame.width+15)
     note_text_area = gui.NoteTextArea(note_text_frame, 0, '')
+
+    buttons_frame = gui.ButtonsFrame(
+        list_frame, note_text_area, list_frame.height-30)
+    add_button = gui.AddButton(buttons_frame)
+    delete_button = gui.DeleteButton(buttons_frame)
 
     notes = handbookapi.get_notes()
 
