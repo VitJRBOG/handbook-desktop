@@ -16,6 +16,13 @@ def make_gui():
     add_button = gui.AddButton(buttons_frame)
     delete_button = gui.DeleteButton(buttons_frame)
 
+    note_manage_buttons_frame = gui.NoteManageButtonsFrame(
+        main_frame,
+        note_text_area,
+        list_frame.width+15,
+        note_text_area.height+10)
+    save_button = gui.SaveButton(note_manage_buttons_frame)
+
     notes = handbookapi.get_notes()
 
     for i, note in enumerate(notes):

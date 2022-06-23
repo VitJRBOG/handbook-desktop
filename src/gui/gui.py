@@ -50,7 +50,7 @@ class NoteTextFrame(tk.Canvas):
 
     def __init__(self, master: MainFrame, indent: int):
         self.width = int(master.width * 0.65)
-        self.height = master.height - 10
+        self.height = master.height - 40
 
         super().__init__(master, width=self.width, height=self.height)
 
@@ -82,6 +82,36 @@ class NoteTextArea(tkst.ScrolledText):
         self.delete('0.0', tk.END)
         self.text = text
         self.insert(tk.END, self.text)
+
+
+class NoteManageButtonsFrame(tk.Canvas):
+    note_text_area: NoteTextArea
+
+    def __init__(self, master: MainFrame,
+                 note_text_area: NoteTextArea,
+                 indent_x: int, indent_y: int):
+
+        self.note_text_area = note_text_area
+
+        super().__init__(master)
+
+        self.place(x=indent_x, y=indent_y)
+
+    def add_version(self):
+        if self.note_text_area.note_id != 0:
+            note_id = self.note_text_area.note_id
+            text = self.note_text_area.get('1.0', tk.END)
+            handbookapi.add_version(note_id, text)
+
+
+class SaveButton(tk.Button):
+    def __init__(self, master: NoteManageButtonsFrame):
+        super().__init__(master, text='Save',
+                         command=lambda: threading.Thread(
+                             target=master.add_version,
+                             daemon=True).start())
+
+        self.place(x=0, y=0)
 
 
 class NotesListFrame(tk.Canvas):
