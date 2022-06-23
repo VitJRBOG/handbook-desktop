@@ -1,7 +1,9 @@
 import threading
 import tkinter as tk
 import tkinter.scrolledtext as tkst
+import tkinter.ttk as ttk
 from typing import List
+from datetime import datetime
 
 from handbookapi import handbookapi
 
@@ -114,6 +116,19 @@ class SaveButton(tk.Button):
         self.place(x=0, y=0)
 
 
+class NoteVersionsList(ttk.Combobox):
+    note_id: int
+    text_var: tk.StringVar
+
+    def __init__(self, master: NoteManageButtonsFrame, versions: List[str]):
+        self.text_var = tk.StringVar()
+        super().__init__(master, textvariable=self.text_var,
+                         values=versions, state='readonly')
+        self.text_var.set(versions[len(versions)-1])
+
+        self.place(x=70, y=0)
+
+
 class NotesListFrame(tk.Canvas):
     width: int
     height: int
@@ -134,13 +149,16 @@ class NoteTitleLabel(tk.Label):
     bg_color_default = '#A4A4A4'
     bg_color_focused = '#808080'
     note_text_area: NoteTextArea
+    version_list: NoteVersionsList
 
     def __init__(self, master: NotesListFrame, note_id: int, title: str,
-                 position: List[int], note_text_area: NoteTextArea):
+                 position: List[int], note_text_area: NoteTextArea,
+                 version_list: NoteVersionsList):
         self.note_id = note_id
         self.text_var = tk.StringVar()
         self.text_var.set(title)
         self.note_text_area = note_text_area
+        self.version_list = version_list
 
         super().__init__(master, textvariable=self.text_var)
 
@@ -148,7 +166,7 @@ class NoteTitleLabel(tk.Label):
 
         self.bind('<Enter>', self.__set_red_color)
         self.bind('<Leave>', self.__set_default_color)
-        self.bind('<Button-1>', self.__display_note_text)
+        self.bind('<Button-1>', self.__display_note)
 
         self.place(x=position[0], y=position[1])
 
@@ -158,9 +176,19 @@ class NoteTitleLabel(tk.Label):
     def __set_default_color(self, event):
         self.config(bg=self.bg_color_default)
 
-    def __display_note_text(self, event):
+    def __display_note(self, event):
         notes = handbookapi.get_versions(self.note_id)
         self.note_text_area.update_text(notes[0].id, notes[0].text)
+
+        versions: List[str] = []
+
+        for version in notes:
+            date = datetime.utcfromtimestamp(
+                version.date).strftime('%d.%m.%Y %H:%M:%S')
+            versions.append(date)
+
+        self.version_list.config(values=versions)
+        self.version_list.text_var.set(versions[0])
 
 
 class ButtonsFrame(tk.Canvas):

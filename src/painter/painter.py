@@ -22,6 +22,7 @@ def make_gui():
         list_frame.width+15,
         note_text_area.height+10)
     save_button = gui.SaveButton(note_manage_buttons_frame)
+    note_versions_list = gui.NoteVersionsList(note_manage_buttons_frame, [''])
 
     notes = handbookapi.get_notes()
 
@@ -29,6 +30,7 @@ def make_gui():
         position = [15, i * 25 + 15]
 
         gui.NoteTitleLabel(list_frame, note.id, note.title,
-                           position, note_text_area)
+                           position, note_text_area,
+                           note_versions_list)
 
     main_window.mainloop()
